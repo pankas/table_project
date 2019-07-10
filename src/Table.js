@@ -1,6 +1,5 @@
 import React from 'react'
 import axios from 'axios';
-import {Link} from 'react-router-dom';
 import './App.css';
 
 class Table extends React.Component{
@@ -8,30 +7,73 @@ class Table extends React.Component{
         super(prop);
         this.state = {
             employee:[],
-            from:'',
-            per_page:'',
-            last_page:'',
             currentPage:1,
-            data_page:10,
-            direction:{
-              dir:'asc'
-            },
+            dataPerPage:10,
             searchQuery:'',
-            upperPageBound: 3,
-            lowerPageBound: 0,
+            upperLimit: 3,
+            lowerLimit: 0,
             isPrevBtnActive: 'disabled',
-            pageBound: 3
+            isNextBtnActive:'',
+            isPrevBtnActive:'',
+            paginationLimit: 3
         }
-
         this.handleClick = this.handleClick.bind(this);
     }
-
-    handleUserInput(searchQuery) {
-        this.setState({searchQuery: searchQuery});
-      };
-
-      setPrevAndNextBtnClass(listid) {
-        let totalPage = Math.ceil(this.state.employee.length / this.state.data_page);
+    //INPUT FIELDS
+    onSearch = (e)=>{
+      this.setState({
+        searchQuery:e.target.value
+      })
+    }
+    //ENDS
+    //LOADING TABLE DATA
+    componentDidMount(){
+      let url = 'https://demo9197058.mockable.io/users'
+      axios.get(url).then(res =>{
+        console.log(res)
+        this.setState({
+            employee:res.data
+        })
+      }).catch(err =>{
+          console.log(err)
+      });
+    }
+    //ENDS
+    //POPULATING ROW
+    renderTable = (row,index)=>{        
+      return <tr key={index} onClick={this.showDetails.bind(this,row.id)} >
+      <td scope="row">{row.id}</td>
+      <td>{row.first_name}</td>
+      <td>{row.last_name}</td>
+      <td>{row.age}</td>
+      <td>{row.company_name}</td>
+      <td>{row.web}</td>
+      <td>{row.city}</td>
+      <td>{row.state}</td>
+      <td>{row.zip}</td>
+       </tr>;
+      }
+    //ENDS
+    //SORTING TABLE DATRA
+    onSort = (key)=>{
+      const employee = this.state.employee;
+      console.log(employee)
+      // const data = this.state.employee.sort((a,b)=> {a[key] < b[key]})
+      employee.sort((a,b)=> (
+      a[key].toString().localeCompare(b[key]))
+      )
+      this.setState({employee})
+    }
+    //ENDS
+    //DISPLAY DETAILS
+    showDetails = (id)=>{
+      localStorage.setItem('id',id);
+      window.location = '/details';
+    }
+    //ENDS
+    //PAGNATION BUTTON
+      setPrevAndNextBtn(listid) {
+        let totalPage = Math.ceil(this.state.employee.length / this.state.dataPerPage);
         this.setState({isNextBtnActive: 'disabled'});
         this.setState({isPrevBtnActive: 'disabled'});
         if(totalPage === listid && totalPage > 1){
@@ -45,117 +87,68 @@ class Table extends React.Component{
             this.setState({isPrevBtnActive: ''});
         }
     }
-
+    //JUMP UPTO UPPER LIMITE
       btnIncrementClick = () =>{
-        this.setState({upperPageBound: this.state.upperPageBound + this.state.pageBound});
-        this.setState({lowerPageBound: this.state.lowerPageBound + this.state.pageBound});
-        let listid = this.state.upperPageBound + 1;
+        this.setState({upperLimit: this.state.upperLimit + this.state.paginationLimit});
+        this.setState({lowerLimit: this.state.lowerLimit + this.state.paginationLimit});
+        let listid = this.state.upperLimit + 1;
         this.setState({ currentPage: listid});
-        this.setPrevAndNextBtnClass(listid);
+        this.setPrevAndNextBtn(listid);
       }
-
+    //ENDS
+    //JUMP UPTO LOWER LIMIT
         btnDecrementClick = ()=> {
-          this.setState({upperPageBound: this.state.upperPageBound - this.state.pageBound});
-          this.setState({lowerPageBound: this.state.lowerPageBound - this.state.pageBound});
-          let listid = this.state.upperPageBound - this.state.pageBound;
+          this.setState({upperLimit: this.state.upperLimit - this.state.paginationLimit});
+          this.setState({lowerLimit: this.state.lowerLimit - this.state.paginationLimit});
+          let listid = this.state.upperLimit - this.state.paginationLimit;
           this.setState({ currentPage: listid});
-          this.setPrevAndNextBtnClass(listid);
+          this.setPrevAndNextBtn(listid);
       }
-
-
+    //ENDS
+    //PREVIOUS BUTTON
         btnPrevClick = ()=> {
-          if((this.state.currentPage -1)%this.state.pageBound === 0 ){
-              this.setState({upperPageBound: this.state.upperPageBound - this.state.pageBound});
-              this.setState({lowerPageBound: this.state.lowerPageBound - this.state.pageBound});
+          if((this.state.currentPage -1)%this.state.paginationLimit === 0 ){
+              this.setState({upperLimit: this.state.upperLimit - this.state.paginationLimit});
+              this.setState({lowerLimit: this.state.lowerLimit - this.state.paginationLimit});
           }
           let listid = this.state.currentPage - 1;
           this.setState({ currentPage : listid});
-          this.setPrevAndNextBtnClass(listid);
+          this.setPrevAndNextBtn(listid);
         }
-
+    //ENDS
+    //NEXT BUTTON
         btnNextClick=()=> {
-          if((this.state.currentPage +1) > this.state.upperPageBound ){
-              this.setState({upperPageBound: this.state.upperPageBound + this.state.pageBound});
-              this.setState({lowerPageBound: this.state.lowerPageBound + this.state.pageBound});
+          if((this.state.currentPage +1) > this.state.upperLimit ){
+              this.setState({upperLimit: this.state.upperLimit + this.state.paginationLimit});
+              this.setState({lowerLimit: this.state.lowerLimit + this.state.paginationLimit});
           }
           let listid = this.state.currentPage + 1;
           this.setState({ currentPage : listid});
-          this.setPrevAndNextBtnClass(listid);
+          this.setPrevAndNextBtn(listid);
         }
-
+    //ENDS
+    //CLICK ON THE PAGINATION BUTTON
         handleClick(event) {
           let listid = Number(event.target.id);
           this.setState({
             currentPage: listid
           });
-          this.setPrevAndNextBtnClass(listid);
+          this.setPrevAndNextBtn(listid);
         }
-
-        sortBy = (key)=>{
-            const employee = this.state.employee;
-            // const data = this.state.employee.sort((a,b)=> {a[key] < b[key]})
-            employee.sort((a,b)=> (this.state.direction.dir == 'asc'?
-            a[key].toString().localeCompare(b[key]):b[key].toString().localeCompare(a[key])
-            ))
-            this.setState({employee})
-        }
-
-    componentDidMount(){
-        let url = 'https://demo9197058.mockable.io/users'
-        this.getData(url);
-    }
-    getData(url){
-        axios.get(url).then(res =>{
-                console.log(res)
-                this.setState({
-                    employee:res.data
-                })
-        }).catch(err =>{
-            console.log(err)
-        })
-    }
-
-    showDetails = (id)=>{
-      localStorage.setItem('id',id);
-      var val = 800
-      if(id !== val){
-        console.log(true)
-      // window.location.href = '/details';
-      }
-    }
-    onSearch = (e)=>{
-      this.setState({
-        searchQuery:e.target.value
-      })
-    }
-
-    renderTable = (row,index)=>{        
-          return <tr key={index} onClick={this.showDetails(row.id)} >
-          <td scope="row">{row.id}</td>
-          <td>{row.first_name}</td>
-          <td>{row.last_name}</td>
-          <td>{row.age}</td>
-          <td>{row.company_name}</td>
-          <td>{row.web}</td>
-          <td>{row.city}</td>
-          <td>{row.state}</td>
-          <td>{row.zip}</td>
-      </tr>;
-    }
-
+        //ENDS
     render(){
-      const { currentPage, data_page,upperPageBound,lowerPageBound,isPrevBtnActive,isNextBtnActive } = this.state;
-      const indexOfLastPage = currentPage * data_page;
-      const indexOfFirstPage = indexOfLastPage - data_page;
+      //FILTER DATA PER PAGE
+      const { currentPage, dataPerPage,upperLimit,lowerLimit,isPrevBtnActive,isNextBtnActive } = this.state;
+      const indexOfLastPage = currentPage * dataPerPage;
+      const indexOfFirstPage = indexOfLastPage - dataPerPage;
       const current = this.state.employee.slice(indexOfFirstPage, indexOfLastPage);
-      // const { searchQuery } = this.state;
       const filteredEmployee = current.filter(employee => {
-        console.log("sdkjs",this.state.searchQuery)
         return employee.last_name.toLowerCase().indexOf(this.state.searchQuery.toLowerCase()) !== -1;
       });
-
+      //ENDS
+      //DISPLAYING PAGE NUMBER
       const pageNumbers = [];
-        for (let i = 1; i <= Math.ceil(this.state.employee.length / this.state.data_page); i++) {
+        for (let i = 1; i <= Math.ceil(this.state.employee.length / this.state.dataPerPage); i++) {
           pageNumbers.push(i);
       }
       const renderPageNumbers = pageNumbers.map(number => {
@@ -164,22 +157,26 @@ class Table extends React.Component{
                 <li key={number} className={`${(number === 1 && currentPage === 1) ? "active":"inactive"}`} ><a onClick={this.handleClick}>{number}</a></li>
             )
         }
-        else if((number < upperPageBound + 1) && number > lowerPageBound){
+        else if((number < upperLimit + 1) && number > lowerLimit){
             return(
-                <li key={number} className={`${(number < upperPageBound + 1) && number > lowerPageBound ? "active":"inactive"}`} id={number}><a id={number} onClick={this.handleClick}>{number}</a></li>
+                <li key={number} className={`${(number < upperLimit + 1) && number > lowerLimit ? "active":"inactive"}`} id={number}><a id={number} onClick={this.handleClick}>{number}</a></li>
             )
         }
     });
-
+    //ENDS
+    //DISPLAY PAGE INCREMENT
     let pageIncrementBtn = null;
-    if(pageNumbers.length > upperPageBound){
-        pageIncrementBtn = <li className=''><a href='#' onClick={this.btnIncrementClick}> &hellip; </a></li>
+    if(pageNumbers.length > upperLimit){
+        pageIncrementBtn = <li className=''><a  onClick={this.btnIncrementClick}> &hellip; </a></li>
     }
+    //ENDS
+    //DISPLAY PAGE DECREMENT 
     let pageDecrementBtn = null;
-    if(lowerPageBound >= 1){
-        pageDecrementBtn = <li className=''><a href='#' onClick={this.btnDecrementClick}> &hellip; </a></li>
+    if(lowerLimit >= 1){
+        pageDecrementBtn = <li className=''><a  onClick={this.btnDecrementClick}> &hellip; </a></li>
     }
-
+    //ENDS
+    //PREV BUTTON DISPLAY
     let renderPrevBtn = null;
     if(isPrevBtnActive === 'disabled') {
         renderPrevBtn = <li className={isPrevBtnActive}><span id="btnPrev"> Prev </span></li>
@@ -187,8 +184,8 @@ class Table extends React.Component{
     else{
         renderPrevBtn = <li className={isPrevBtnActive}><a href='#' id="btnPrev" onClick={this.btnPrevClick}> Prev </a></li>
     }
-
-
+    //ENDS
+    //NEXT BUTTON DISPLAY
     let renderNextBtn = null;
     if(isNextBtnActive === 'disabled') {
         renderNextBtn = <li className={isNextBtnActive}><span id="btnNext"> Next </span></li>
@@ -196,7 +193,7 @@ class Table extends React.Component{
     else{
         renderNextBtn = <li className={isNextBtnActive}><a href='#' id="btnNext" onClick={this.btnNextClick}> Next </a></li>
     }
-
+    //ENDS
         return(
             <div className="container">
             {/* <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -219,18 +216,18 @@ class Table extends React.Component{
             <input type="text" className="form-control" value={this.state.searchQuery} onChange={this.onSearch}  placeholder="Search for names.."/>
             </div>
             </div><br/>
-            <div className="row">
+            <div className="row table-responsive">
                <table  className="table table-hover">
                     <thead>
                         <tr>
                             <th scope="col" >ID</th>
-                            <th scope="col" ><button onClick={()=>this.sortBy('first_name')}>FIRST NAME</button></th>
-                            <th scope="col" ><button onClick={()=>this.sortBy('last_name')}>LAST NAME</button></th>
-                            <th scope="col" ><button onClick={()=>this.sortBy('age')}>AGE</button></th>
-                            <th scope="col" ><button onClick={()=>this.sortBy('company_name')}>COMPANY NAME</button></th>
-                            <th scope="col" ><button onClick={()=>this.sortBy('city')}>CITY</button></th>
-                            <th scope="col" ><button onClick={()=>this.sortBy('state')}>STATE</button></th>
-                            <th scope="col" ><button onClick={()=>this.sortBy('zip')}>ZIP</button></th>
+                            <th scope="col" ><i class="fa fa-fw fa-sort" onClick={()=>this.onSort('first_name')} ></i>FIRST NAME  </th>
+                            <th scope="col" ><i class="fa fa-fw fa-sort" onClick={()=>this.onSort('last_name')} ></i> LAST NAME   </th>
+                            <th scope="col" ><i class="fa fa-fw fa-sort" onClick={()=>this.onSort('age')} ></i>AGE</th>
+                            <th scope="col" ><i class="fa fa-fw fa-sort" onClick={()=>this.onSort('company_name')} ></i>COMPANY NAME</th>
+                            <th scope="col" ><i class="fa fa-fw fa-sort" onClick={()=>this.onSort('city')} ></i> CITY </th>
+                            <th scope="col" ><i class="fa fa-fw fa-sort" onClick={()=>this.onSort('state')} ></i>STATE</th>
+                            <th scope="col" ><i class="fa fa-fw fa-sort" onClick={()=>this.onSort('zip')} ></i>  ZIP  </th>
                         </tr>
                     </thead>
                     <tbody>

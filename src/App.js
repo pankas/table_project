@@ -7,8 +7,8 @@ function App() {
   return (
     <div className="App">
     <BrowserRouter>
-      <Route path='/' component={Table} />
-      <Route  path='/details' component={RowDetails}/>
+      <Route exact path='/' component={Table} />
+      <Route  path='/details' component={RowDetails} />
     </BrowserRouter>
 
     </div>
