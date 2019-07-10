@@ -1,14 +1,15 @@
 import React from 'react';
 import axios from 'axios';
-
+import {Link} from 'react-router-dom';
 const id = localStorage.getItem('id');
 
 class RowDetails extends React.Component{
         constructor(prop){
             super(prop);
             this.state={
+                full_name:'',
                 employee:[{
-                    full_name:'',
+                    // full_name:'',
                     company:'',
                     city:'',
                     state:'',
@@ -41,15 +42,16 @@ class RowDetails extends React.Component{
                     // })
                 }
                 this.setState({
+                    full_name:  `${newarr[1]} ${newarr[2]}`,
                         employee:[{
-                            full_name:`${newarr[1]} ${newarr[2]}`,
-                            company: newarr[3],
-                            city:newarr[4],
-                            state:newarr[5],
-                            pin:newarr[6],
-                            email:newarr[7],
-                            web:newarr[8],
-                            age:newarr[9]
+                            // full_name:`${newarr[1]} ${newarr[2]}`,
+                            Company: newarr[3],
+                            City:newarr[4],
+                            State:newarr[5],
+                            Pin:newarr[6],
+                            Email:newarr[7],
+                            Web:newarr[8],
+                            Age:newarr[9]
                         }]
                 })
             })
@@ -62,16 +64,25 @@ class RowDetails extends React.Component{
             console.log(err)
         })
     }
+
+    back = ()=>{
+            localStorage.clear();
+            window.location = '/'
+            // this.history.push("/");
+    }
         
 
+    componentWillUnmount(){
+        localStorage.clear();
+    }
 
     render(){
         
         // const name = this.state.employee.first_name + this.state.employee.last_name
         return(
-            <div>
-                    {this.state.employee[0].full_name}
-
+            <div className="container" style={{marginTop:"2%"}}>
+                 <h2 className="disp">   {this.state.full_name}</h2>
+                 <div className="table-responsive">
                     <table  className="table table-hover">
                     <tbody>
                         {Object.entries(this.state.employee[0]).map(([key,value]) =>{
@@ -86,6 +97,9 @@ class RowDetails extends React.Component{
                     })} */}
                     </tbody>
                 </table>
+                </div>
+                <br/>
+                <Link to='/'><button to="/" type="button" class="btn btn-info disp" >Back</button></Link>
             </div>
         )
     }

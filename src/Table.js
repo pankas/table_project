@@ -154,12 +154,12 @@ class Table extends React.Component{
       const renderPageNumbers = pageNumbers.map(number => {
         if(number === 1 && currentPage === 1){
             return(
-                <li key={number} className={`${(number === 1 && currentPage === 1) ? "active":"inactive"}`} ><a onClick={this.handleClick}>{number}</a></li>
+                <li key={number} className={`${(number === 1 && currentPage === 1) ? "page-item active":""}`} ><a className="page-link"  onClick={this.handleClick}>{number}</a></li>
             )
         }
         else if((number < upperLimit + 1) && number > lowerLimit){
             return(
-                <li key={number} className={`${(number < upperLimit + 1) && number > lowerLimit ? "active":"inactive"}`} id={number}><a id={number} onClick={this.handleClick}>{number}</a></li>
+                <li key={number} className={`${(number < upperLimit + 1) && number > lowerLimit ? "page-item active":""}`}><a className="page-link" onClick={this.handleClick}>{number}</a></li>
             )
         }
     });
@@ -167,58 +167,43 @@ class Table extends React.Component{
     //DISPLAY PAGE INCREMENT
     let pageIncrementBtn = null;
     if(pageNumbers.length > upperLimit){
-        pageIncrementBtn = <li className=''><a  onClick={this.btnIncrementClick}> &hellip; </a></li>
+        pageIncrementBtn = <li className="page-item"><a className="page-link"  onClick={this.btnIncrementClick}> &hellip; </a></li>
     }
     //ENDS
     //DISPLAY PAGE DECREMENT 
     let pageDecrementBtn = null;
     if(lowerLimit >= 1){
-        pageDecrementBtn = <li className=''><a  onClick={this.btnDecrementClick}> &hellip; </a></li>
+        pageDecrementBtn = <li className="page-item"><a className="page-link" onClick={this.btnDecrementClick}> &hellip; </a></li>
     }
     //ENDS
     //PREV BUTTON DISPLAY
     let renderPrevBtn = null;
     if(isPrevBtnActive === 'disabled') {
-        renderPrevBtn = <li className={isPrevBtnActive}><span id="btnPrev"> Prev </span></li>
+        renderPrevBtn = <li className="page-item"><span> Prev </span></li>
     }
     else{
-        renderPrevBtn = <li className={isPrevBtnActive}><a href='#' id="btnPrev" onClick={this.btnPrevClick}> Prev </a></li>
+        renderPrevBtn = <li className="page-item"><a className="page-link" onClick={this.btnPrevClick}> Prev </a></li>
     }
     //ENDS
     //NEXT BUTTON DISPLAY
     let renderNextBtn = null;
     if(isNextBtnActive === 'disabled') {
-        renderNextBtn = <li className={isNextBtnActive}><span id="btnNext"> Next </span></li>
+        renderNextBtn = <li className="page-item"><span > Next </span></li>
     }
     else{
-        renderNextBtn = <li className={isNextBtnActive}><a href='#' id="btnNext" onClick={this.btnNextClick}> Next </a></li>
+        renderNextBtn = <li className="page-item"><a className="page-link" onClick={this.btnNextClick}> Next </a></li>
     }
     //ENDS
         return(
-            <div className="container">
-            {/* <nav class="navbar navbar-expand-lg navbar-light bg-light">
-              <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-              </button>
-              <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                <div class="navbar-nav">
-                  <div className="navbar-collapse collapse">
-                  <ul className="nav nav-justified">
-                    <li><a href="#" className="navbar-brand" style={{marginLeft:"40%"}}>Brand</a></li>
-                  </ul>
-                </div>
-                </div>
-              </div>
-            </nav> */}
-
-            <div className="row" style={{marginTop:"5%"}}>
+            <div className="container-fluid" style={{padding:"5%"}} >
+            <div className="row" >
             <div className="col-sm-6">
             <input type="text" className="form-control" value={this.state.searchQuery} onChange={this.onSearch}  placeholder="Search for names.."/>
             </div>
             </div><br/>
             <div className="row table-responsive">
-               <table  className="table table-hover">
-                    <thead>
+               <table  className="table table-hover" style={{marginLeft:"2%"}}>
+                    <thead style={{fontSize:"0.77rem"}}>
                         <tr>
                             <th scope="col" >ID</th>
                             <th scope="col" ><i class="fa fa-fw fa-sort" onClick={()=>this.onSort('first_name')} ></i>FIRST NAME  </th>
@@ -237,7 +222,8 @@ class Table extends React.Component{
                     </tbody>
                 </table>
                 </div>
-                <div className="row">
+               <br/>
+                <nav ariaLabel="Page navigation example">
                 <ul className="pagination" id="page-numbers">  
                   {renderPrevBtn}
                   {pageDecrementBtn}
@@ -245,8 +231,8 @@ class Table extends React.Component{
                   {pageIncrementBtn}
                   {renderNextBtn}
                 </ul>
-
-            </div>
+</nav>
+                
              </div>   
         )
     }
