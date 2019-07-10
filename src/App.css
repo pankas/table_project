@@ -31,3 +31,50 @@
     transform: rotate(360deg);
   }
 }
+
+#page-numbers {
+  list-style: none;
+  display: flex;
+}
+
+#page-numbers > li {
+  margin-right: 0.3em;
+  color: blue;
+  user-select: none;
+  cursor: pointer;
+}
+
+.navbar-brand {
+  padding: 0px;
+}
+.navbar-brand {
+  height: 100%;
+  width: auto;
+  padding: 7px 14px;
+}
+
+
+.pagination {
+  margin-top: 25px;
+}
+.pagination li {
+cursor: pointer;
+color: black;
+float: left;
+padding: 8px 16px;
+text-decoration: none;
+transition: background-color .3s;
+border: 1px solid #ddd;
+}
+
+.pagination li.active {
+background-color: #0099FF;
+color: white;
+border: 1px solid #0099FF;
+}
+
+.pagination li.inactive {
+  background-color: white;
+  color: #0099FF;
+  border: 1px solid white;
+  }
