@@ -15,7 +15,8 @@ class Table extends React.Component{
             isPrevBtnActive: 'disabled',
             isNextBtnActive:'',
             isPrevBtnActive:'',
-            paginationLimit: 3
+            paginationLimit: 3,
+            active:'page-item active'
         }
         this.handleClick = this.handleClick.bind(this);
     }
@@ -131,7 +132,8 @@ class Table extends React.Component{
         handleClick(event) {
           let listid = Number(event.target.id);
           this.setState({
-            currentPage: listid
+            currentPage: listid,
+            active:"active"
           });
           this.setPrevAndNextBtn(listid);
         }
@@ -141,28 +143,42 @@ class Table extends React.Component{
       const { currentPage, dataPerPage,upperLimit,lowerLimit,isPrevBtnActive,isNextBtnActive } = this.state;
       const indexOfLastPage = currentPage * dataPerPage;
       const indexOfFirstPage = indexOfLastPage - dataPerPage;
-      const current = this.state.employee.slice(indexOfFirstPage, indexOfLastPage);
-      const filteredEmployee = current.filter(employee => {
+
+      // 
+      const filteredEmployee = this.state.employee.filter(employee => {
         return employee.last_name.toLowerCase().indexOf(this.state.searchQuery.toLowerCase()) !== -1;
       });
+      const current = filteredEmployee.slice(indexOfFirstPage, indexOfLastPage);
       //ENDS
       //DISPLAYING PAGE NUMBER
       const pageNumbers = [];
         for (let i = 1; i <= Math.ceil(this.state.employee.length / this.state.dataPerPage); i++) {
           pageNumbers.push(i);
       }
-      const renderPageNumbers = pageNumbers.map(number => {
-        if(number === 1 && currentPage === 1){
-            return(
-                <li key={number} className={`${(number === 1 && currentPage === 1) ? "page-item active":""}`} ><a className="page-link"  onClick={this.handleClick}>{number}</a></li>
-            )
-        }
-        else if((number < upperLimit + 1) && number > lowerLimit){
-            return(
-                <li key={number} className={`${(number < upperLimit + 1) && number > lowerLimit ? "page-item active":""}`}><a className="page-link" onClick={this.handleClick}>{number}</a></li>
-            )
-        }
-    });
+    //   const renderPageNumbers = pageNumbers.map(number => {
+    //     if(number === 1 && currentPage === 1){
+    //         return(
+    //             <li key={number} className={`${(number === 1 && currentPage === 1) ? "page-item active":""}`} ><a className="page-link"  onClick={this.handleClick}>{number}</a></li>
+    //         )
+    //     }
+    //     else if((number < upperLimit + 1) && number > lowerLimit){
+    //         return(
+    //             <li key={number} className={`${(number < upperLimit + 1) && number > lowerLimit ? "page-item active":""}`}><a className="page-link" onClick={this.handleClick}>{number}</a></li>
+    //         )
+    //     }
+    // });
+    const renderPageNumbers = pageNumbers.map(number => {
+      if(number === 1 && currentPage === 1){
+          return(
+              <li key={number} className={`${this.state.active}`} id={number}><a href='#' className="page-link" id={number} onClick={this.handleClick}>{number}</a></li>
+          )
+      }
+      else if((number < upperLimit + 1) && number > lowerLimit){
+          return(
+              <li key={number} id={number}><a href='#' id={number} className="page-link" onClick={this.handleClick}>{number}</a></li>
+          )
+      }
+  });
     //ENDS
     //DISPLAY PAGE INCREMENT
     let pageIncrementBtn = null;
@@ -216,7 +232,7 @@ class Table extends React.Component{
                         </tr>
                     </thead>
                     <tbody>
-                    {filteredEmployee.map(employee => {
+                    {current.map(employee => {
                        return this.renderTable(employee);
                     })}
                     </tbody>
